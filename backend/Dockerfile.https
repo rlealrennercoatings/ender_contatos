@@ -1,0 +1,15 @@
+FROM node:20-alpine
+
+RUN apk add --no-cache openssl libc6-compat
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN if [ -f package-lock.json ]; then npm ci --legacy-peer-deps || npm install; else npm install; fi
+
+COPY . .
+
+EXPOSE 3000
+
+CMD ["node", "-e", "const https = require('https'); const fs = require('fs'); const app = require('./dist/main').default; const options = { key: fs.readFileSync('/certs/key.pem'), cert: fs.readFileSync('/certs/cert.pem') }; https.createServer(options, app).listen(3000);"]

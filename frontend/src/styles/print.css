@@ -1,0 +1,173 @@
+@media print {
+  /* Esconde tudo por padrão */
+  body * {
+    display: none !important;
+  }
+
+  /* Mostra apenas o dialog e seu conteúdo */
+  .MuiDialog-paper,
+  .MuiDialog-paper *,
+  .MuiDialogContent-root,
+  .MuiDialogContent-root * {
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  /* Esconde o título e as ações */
+  .MuiDialogTitle-root {
+    display: none !important;
+  }
+
+  .MuiDialogActions-root {
+    display: none !important;
+  }
+
+  /* Configura o dialog para impressão */
+  .MuiDialog-root {
+    display: block !important;
+    position: static !important;
+  }
+
+  .MuiDialog-container {
+    display: block !important;
+    position: static !important;
+  }
+
+  .MuiDialog-backdrop {
+    display: none !important;
+  }
+
+  .MuiPaper-root.MuiDialog-paper {
+    position: static !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    page-break-after: avoid !important;
+  }
+
+  .MuiDialogContent-root {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Garante visibilidade e display de tudo dentro do content */
+  .MuiDialogContent-root div,
+  .MuiDialogContent-root span,
+  .MuiDialogContent-root p,
+  .MuiDialogContent-root h1,
+  .MuiDialogContent-root h2,
+  .MuiDialogContent-root h3,
+  .MuiDialogContent-root h4,
+  .MuiDialogContent-root h5,
+  .MuiDialogContent-root h6,
+  .MuiDialogContent-root ul,
+  .MuiDialogContent-root ol,
+  .MuiDialogContent-root li,
+  .MuiDialogContent-root blockquote,
+  .MuiDialogContent-root code,
+  .MuiDialogContent-root pre,
+  .MuiDialogContent-root strong,
+  .MuiDialogContent-root em,
+  .MuiDialogContent-root u,
+  .MuiDialogContent-root a {
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  /* Formatação de elementos HTML do editor */
+  .ql-editor h1 {
+    font-size: 1.75rem !important;
+    font-weight: 700 !important;
+    margin: 0.5rem 0 !important;
+    page-break-after: avoid !important;
+  }
+
+  .ql-editor h2 {
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    margin: 0.5rem 0 !important;
+    page-break-after: avoid !important;
+  }
+
+  .ql-editor h3 {
+    font-size: 1.25rem !important;
+    font-weight: 700 !important;
+    margin: 0.5rem 0 !important;
+    page-break-after: avoid !important;
+  }
+
+  .ql-editor p {
+    margin-bottom: 0.5rem !important;
+  }
+
+  .ql-editor ol,
+  .ql-editor ul {
+    padding-left: 2rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .ql-editor li {
+    margin-bottom: 0.25rem !important;
+  }
+
+  .ql-editor blockquote {
+    border-left: 4px solid #333 !important;
+    padding-left: 1rem !important;
+    margin: 0.5rem 0 !important;
+    font-style: italic !important;
+  }
+
+  .ql-editor code {
+    background-color: #f5f5f5 !important;
+    padding: 2px 6px !important;
+    border-radius: 3px !important;
+    font-family: 'Courier New', monospace !important;
+    font-size: 0.875em !important;
+  }
+
+  .ql-editor pre {
+    background-color: #f5f5f5 !important;
+    padding: 1rem !important;
+    border-radius: 4px !important;
+    overflow: auto !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .ql-editor strong {
+    font-weight: 700 !important;
+  }
+
+  .ql-editor em {
+    font-style: italic !important;
+  }
+
+  .ql-editor u {
+    text-decoration: underline !important;
+  }
+
+  .ql-editor a {
+    color: #1976d2 !important;
+    text-decoration: underline !important;
+  }
+
+  /* Remove margens e padding extra */
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  html {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Configura a página */
+  @page {
+    size: A4;
+    margin: 10mm;
+    orphans: 2;
+    widows: 2;
+  }
+}
