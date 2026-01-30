@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Box,
@@ -103,11 +103,28 @@ export default function ContatosList() {
     }
   }
 
-  const getTelefonePrincipal = (contato: Contato): string => {
+  const getTelefonePrincipal = (contato: Contato): { numero: string; tipo: string } | null => {
     const endereco = contato.enderecos?.[0]
-    const primeiraTelefone = endereco?.telefones?.[0]
-    return primeiraTelefone?.numero ? maskPhone(primeiraTelefone.numero) : '-'
+    const telefones = endereco?.telefones || []
+    
+    if (telefones.length === 0) return null
+    
+    // Priorizar celular
+    const celular = telefones.find(t => t.tipo === 'CELULAR')
+    if (celular) return { numero: celular.numero, tipo: 'CELULAR' }
+    
+    // Se não houver celular, retornar o primeiro telefone
+    return { numero: telefones[0].numero, tipo: telefones[0].tipo }
   }
+
+  // Memoizar telefones dos contatos para melhor performance
+  const telefonesMap = useMemo(() => {
+    const map = new Map()
+    contatos.forEach(c => {
+      map.set(c.id, getTelefonePrincipal(c))
+    })
+    return map
+  }, [contatos])
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
@@ -120,9 +137,9 @@ export default function ContatosList() {
     }, 100)
   }
 
-  const getWhatsAppLink = (telefone: string): string => {
+  const getWhatsAppLink = (numero: string): string => {
     // Remover caracteres não numéricos
-    const apenasNumeros = telefone.replace(/\D/g, '')
+    const apenasNumeros = numero.replace(/\D/g, '')
     // Se não tiver o código do país, adicionar 55 (Brasil)
     const numeroFormatado = apenasNumeros.startsWith('55') ? apenasNumeros : '55' + apenasNumeros
     return `https://wa.me/${numeroFormatado}`
@@ -268,33 +285,36 @@ export default function ContatosList() {
                     </TableCell>
                     <TableCell sx={{ whiteSpace: 'nowrap', padding: '12px 8px' }}>
                       <Box display="flex" alignItems="center" gap={0.5}>
-                        {getTelefonePrincipal(contato) !== '-' && (
+                        {telefonesMap.get(contato.id) ? (
                           <>
-                            <Tooltip title="Abrir WhatsApp">
-                              <IconButton
-                                component="a"
-                                href={getWhatsAppLink(getTelefonePrincipal(contato))}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                size="small"
-                                sx={{ padding: '2px', color: '#25D366' }}
-                              >
-                                <WhatsAppIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                            <span>{maskPhone(getTelefonePrincipal(contato))}</span>
+                            {telefonesMap.get(contato.id)?.tipo === 'CELULAR' && (
+                              <Tooltip title="Abrir WhatsApp">
+                                <IconButton
+                                  component="a"
+                                  href={getWhatsAppLink(telefonesMap.get(contato.id)?.numero || '')}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  size="small"
+                                  sx={{ padding: '2px', color: '#25D366' }}
+                                >
+                                  <WhatsAppIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            )}
+                            <span>{maskPhone(telefonesMap.get(contato.id)?.numero || '')}</span>
                             <Tooltip title="Copiar telefone">
                               <IconButton
                                 size="small"
                                 sx={{ padding: '2px' }}
-                                onClick={() => copyToClipboard(getTelefonePrincipal(contato))}
+                                onClick={() => copyToClipboard(telefonesMap.get(contato.id)?.numero || '')}
                               >
                                 <CopyIcon fontSize="small" />
                               </IconButton>
                             </Tooltip>
                           </>
+                        ) : (
+                          '-'
                         )}
-                        {getTelefonePrincipal(contato) === '-' && '-'}
                       </Box>
                     </TableCell>
                     <TableCell sx={{ whiteSpace: 'nowrap', padding: '12px 8px', maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -456,34 +476,36 @@ export default function ContatosList() {
                   </Box>
 
                   <Box sx={{ borderTop: '1px solid', borderColor: 'divider', pt: 1.5 }}>
-                    {getTelefonePrincipal(contato) !== '-' && (
+                    {telefonesMap.get(contato.id) && (
                       <Box display="flex" alignItems="center" gap={1} mb={1}>
-                        <WhatsAppIcon sx={{ fontSize: '20px', color: '#25D366', flexShrink: 0 }} />
-                        <Tooltip title="Abrir WhatsApp">
+                        {telefonesMap.get(contato.id)?.tipo === 'CELULAR' && (
+                          <WhatsAppIcon sx={{ fontSize: '20px', color: '#25D366', flexShrink: 0 }} />
+                        )}
+                        <Tooltip title={telefonesMap.get(contato.id)?.tipo === 'CELULAR' ? "Abrir WhatsApp" : undefined}>
                           <Box
-                            component="a"
-                            href={getWhatsAppLink(getTelefonePrincipal(contato))}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            component={telefonesMap.get(contato.id)?.tipo === 'CELULAR' ? "a" : "span"}
+                            href={telefonesMap.get(contato.id)?.tipo === 'CELULAR' ? getWhatsAppLink(telefonesMap.get(contato.id)?.numero || '') : undefined}
+                            target={telefonesMap.get(contato.id)?.tipo === 'CELULAR' ? "_blank" : undefined}
+                            rel={telefonesMap.get(contato.id)?.tipo === 'CELULAR' ? "noopener noreferrer" : undefined}
                             sx={{
                               flex: 1,
                               minWidth: 0,
-                              color: 'primary.main',
+                              color: telefonesMap.get(contato.id)?.tipo === 'CELULAR' ? 'primary.main' : 'inherit',
                               textDecoration: 'none',
                               overflow: 'hidden',
                               textOverflow: 'ellipsis',
                               whiteSpace: 'nowrap',
-                              '&:hover': { textDecoration: 'underline' },
+                              '&:hover': { textDecoration: telefonesMap.get(contato.id)?.tipo === 'CELULAR' ? 'underline' : 'none' },
                             }}
                           >
-                            {maskPhone(getTelefonePrincipal(contato))}
+                            {maskPhone(telefonesMap.get(contato.id)?.numero || '')}
                           </Box>
                         </Tooltip>
                         <Tooltip title="Copiar telefone">
                           <IconButton
                             size="small"
                             sx={{ p: 0.5, flexShrink: 0 }}
-                            onClick={() => copyToClipboard(getTelefonePrincipal(contato))}
+                            onClick={() => copyToClipboard(telefonesMap.get(contato.id)?.numero || '')}
                           >
                             <CopyIcon fontSize="small" />
                           </IconButton>
