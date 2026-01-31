@@ -5,6 +5,7 @@ const common_1 = require("@nestjs/common");
 const app_module_1 = require("./app.module");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    app.set('trust proxy', 1);
     app.use((req, res, next) => {
         const start = Date.now();
         res.on('finish', () => {
@@ -17,9 +18,7 @@ async function bootstrap() {
         whitelist: true,
         forbidNonWhitelisted: false,
         transform: true,
-        transformOptions: {
-            enableImplicitConversion: true,
-        },
+        transformOptions: { enableImplicitConversion: true },
     }));
     app.enableCors({
         origin: true,
