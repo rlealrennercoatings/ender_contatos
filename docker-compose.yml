@@ -2,12 +2,15 @@ services:
   db:
     image: postgres:15
     container_name: contatos_db
+    restart: unless-stopped
     environment:
       POSTGRES_DB: contatos
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U admin"]
       interval: 10s
@@ -19,6 +22,7 @@ services:
   api:
     build: ./backend
     container_name: contatos_api
+    restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
@@ -37,6 +41,7 @@ services:
   web:
     build: ./frontend
     container_name: contatos_web
+    restart: unless-stopped
     depends_on:
       - api
     networks:
